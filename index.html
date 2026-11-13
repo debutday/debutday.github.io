@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10201a">
+<meta name="description" content="Debut Day: tvoje fotbalová kariéra od prvního zápasu až k legendě.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Debut Day">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<title>Debut Day</title>
+<link rel="preload" href="assets/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/bigshoulders-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400 900; font-stretch: 100% 125%; font-display: swap; src: url(assets/archivo-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400 900; font-stretch: 100% 125%; font-display: swap; src: url(assets/archivo-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Big Shoulders'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(assets/bigshoulders-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Big Shoulders'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(assets/bigshoulders-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  .splash-logo { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 12px 40px -12px #000; animation: splash-bounce 1.2s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .splash-logo { animation: none; } }
+  .lock { display: flex; flex-direction: column; gap: 10px; width: min(300px, calc(100vw - 32px)); margin-top: 18px; }
+  .lock[hidden] { display: none; }
+  .lock input { font: 16px Archivo, system-ui, sans-serif; padding: 12px 14px; border-radius: 10px; border: 1px solid #567c6a; background: #17302a; color: #f4f1e6; }
+  .lock input:focus-visible { outline: 2px solid #ffc52e; outline-offset: 2px; }
+  .lock button { font: 800 16px Archivo, system-ui, sans-serif; padding: 12px 14px; border-radius: 10px; border: 0; background: #ffc52e; color: #10201a; cursor: pointer; }
+  .lock button:disabled { opacity: .6; }
+  .lock-err { color: #ff8a8a; font-size: 14px; min-height: 20px; text-align: center; }
+</style>
+<style>
+  .splash { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: #10201a; color: #f4f1e6; font-family: Archivo, system-ui, sans-serif; }
+  .splash-ball { font-size: 44px; animation: splash-bounce 1s ease-in-out infinite; }
+  .splash-t { font: 900 36px 'Big Shoulders', Archivo, system-ui, sans-serif; letter-spacing: .01em; text-transform: uppercase; }
+  .splash-s { color: #9db0a3; font-size: 14px; }
+  @keyframes splash-bounce { 50% { transform: translateY(-14px); } }
+  @media (prefers-reduced-motion: reduce) { .splash-ball { animation: none; } }
+</style>
+</head>
+<body>
+<div id="app"><div class="splash"><img class="splash-logo" src="assets/icon-192.png" alt="" width="96" height="96"><div class="splash-t">Debut Day</div><div class="splash-s" id="lock-msg">Načítám…</div>
+<form class="lock" id="lock" hidden><input id="lock-pass" type="password" autocomplete="current-password" placeholder="Heslo" aria-label="Heslo" required><button id="lock-go">Hrát</button><div class="lock-err" id="lock-err" role="alert"></div></form></div></div>
+<div id="match-root"></div>
+<script>
+(() => {
+  const M = {"salt":"ORwfZ4EuhYv+j2NjihJr5A==","iv":"ewHLlPsd12W54NOf","it":250000,"v":"46633b9093"}, KEY = 'ckl-lock', $ = id => document.getElementById(id);
+  // jazyk zamykací stránky: stejně jako ve hře uložená volba (dd-lang), jinak jazyk zařízení, jinak angličtina
+  const LT = {
+    cs: ['Hra je zamčená. Zadej heslo, které ti dal autor.', 'Hru se nepodařilo stáhnout. Zkontroluj připojení.', 'Prohlížeč je moc starý. Aktualizuj ho a zkus to znovu.', 'Špatné heslo, zkus to znovu.', 'Heslo', 'Hrát', 'Načítám…'],
+    en: ['The game is locked. Enter the password you were given.', "Couldn't download the game. Check your connection.", 'Your browser is too old. Update it and try again.', 'Wrong password, try again.', 'Password', 'Play', 'Loading…'],
+    es: ['El juego está bloqueado. Introduce la contraseña que te dieron.', 'No se pudo descargar el juego. Comprueba tu conexión.', 'Tu navegador es demasiado antiguo. Actualízalo y vuelve a intentarlo.', 'Contraseña incorrecta, inténtalo de nuevo.', 'Contraseña', 'Jugar', 'Cargando…'],
+    fr: ['Le jeu est verrouillé. Saisis le mot de passe qu’on t’a donné.', 'Impossible de télécharger le jeu. Vérifie ta connexion.', 'Ton navigateur est trop ancien. Mets-le à jour et réessaie.', 'Mot de passe incorrect, réessaie.', 'Mot de passe', 'Jouer', 'Chargement…'],
+    pt: ['O jogo está bloqueado. Digite a senha que você recebeu.', 'Não foi possível baixar o jogo. Verifique sua conexão.', 'Seu navegador é muito antigo. Atualize-o e tente de novo.', 'Senha incorreta, tente de novo.', 'Senha', 'Jogar', 'Carregando…'],
+    de: ['Das Spiel ist gesperrt. Gib das Passwort ein, das du bekommen hast.', 'Das Spiel konnte nicht geladen werden. Prüfe deine Verbindung.', 'Dein Browser ist zu alt. Aktualisiere ihn und versuch es noch einmal.', 'Falsches Passwort, versuch es noch einmal.', 'Passwort', 'Spielen', 'Wird geladen…'],
+    it: ['Il gioco è bloccato. Inserisci la password che ti è stata data.', 'Impossibile scaricare il gioco. Controlla la connessione.', 'Il tuo browser è troppo vecchio. Aggiornalo e riprova.', 'Password errata, riprova.', 'Password', 'Gioca', 'Caricamento…'],
+    nl: ['Het spel is vergrendeld. Voer het wachtwoord in dat je hebt gekregen.', 'Het spel kon niet worden gedownload. Controleer je verbinding.', 'Je browser is te oud. Werk hem bij en probeer het opnieuw.', 'Verkeerd wachtwoord, probeer het opnieuw.', 'Wachtwoord', 'Spelen', 'Laden…'],
+  };
+  const LG = (() => { let l; try { l = localStorage.getItem('dd-lang'); } catch (x) { /* bez úložiště */ } if (LT[l]) return l; for (const n of [].concat(navigator.languages || [], navigator.language || [])) { const id = String(n).slice(0, 2).toLowerCase(); if (LT[id]) return id; } return 'en'; })();
+  const [tAsk, tNet, tOld, tBad, pw, play, loading] = LT[LG], L = { ask: tAsk, net: tNet, old: tOld, bad: tBad };
+  document.documentElement.lang = LG; $('lock-pass').placeholder = pw; $('lock-pass').setAttribute('aria-label', pw); $('lock-go').textContent = play; $('lock-msg').textContent = loading;
+  const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  // stažení hry (fresh = znovu ze sítě mimo offline kopii i mezipaměť prohlížeče); výpadek sítě se hlásí jako 'net', ne jako špatné heslo
+  const getBin = fresh => fetch('game.bin?v=' + M.v + (fresh ? '&r=' + Date.now() : ''), fresh ? { cache: 'reload' } : undefined).then(r => { if (!r.ok) throw new Error('net'); return r.arrayBuffer(); }, () => { throw new Error('net'); });
+  let data = getBin();
+  // klíč z hesla; po prvním správném zadání si ho zařízení pamatuje (ne heslo samotné)
+  const derive = async pass => crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(M.salt), iterations: M.it, hash: 'SHA-256' },
+    await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']), { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
+  async function open(key) {
+    let bin;
+    try { bin = await data; } catch (x) { data = getBin(true); throw x; }   // další pokus stáhne hru znovu
+    const raw = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(M.iv) }, key, bin);
+    if (!window.DecompressionStream) throw new Error('old');
+    const txt = await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+    const i = txt.indexOf('\n/*@@CSS@@*/\n'), st = document.createElement('style');
+    st.textContent = txt.slice(0, i); document.head.appendChild(st);
+    const sc = document.createElement('script'); sc.textContent = txt.slice(i + 13); document.body.appendChild(sc);
+  }
+  // klíčem nejde soubor rozšifrovat: nejdřív se zkusí čerstvě stažený (stará kopie po aktualizaci), až pak je heslo opravdu špatné
+  async function unlock(key) {
+    try { await open(key); } catch (x) { const m = String(x && x.message); if (m === 'net' || m === 'old') throw x; data = getBin(true); await open(key); }
+  }
+  // měření: kolik lidí otevřelo odkaz, kolikrát zadali špatné heslo a kolik hru odemklo
+  // (stejné anonymní ID jako ve hře, respektuje vypnuté měření, jen na webu přes https mimo automatické testy)
+  const AN = {"key":"phc_CL9hgJsGaFsG7ffQgaMDs5943qggeDFib9xw3zLcytbh","host":"https://ckl-sync.cestaklegende.workers.dev"};
+  let shown = false, tries = 0;
+  const ev = (event, p) => {
+    try {
+      if (!AN.key || location.protocol !== 'https:' || location.hostname === 'debutday.github.io' || /HeadlessChrome/.test(navigator.userAgent) || localStorage.getItem('ckl-an-off') === '1') return;
+      let id = localStorage.getItem('ckl-an-id');
+      if (!id) { id = crypto.randomUUID ? crypto.randomUUID() : 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); localStorage.setItem('ckl-an-id', id); }
+      const ua = navigator.userAgent, type = /iPad|Tablet/.test(ua) ? 'Tablet' : /Mobi|iPhone|Android/.test(ua) ? 'Mobile' : 'Desktop';
+      const props = Object.assign({}, p, { platform: 'web', web_version: M.v, $device_type: type, $lib: 'debut-day', game: 'debutday' });
+      fetch(AN.host + '/batch/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true,
+        body: JSON.stringify({ api_key: AN.key, batch: [{ event, distinct_id: id, timestamp: new Date().toISOString(), properties: props }] }) }).catch(() => {});
+    } catch (x) { /* měření nesmí rozbít odemčení */ }
+  };
+  const ask = (msg = '') => { $('lock-msg').textContent = L.ask; $('lock').hidden = false; $('lock-err').textContent = msg; $('lock-pass').focus(); if (!shown) { shown = true; ev('lock_view', {}); } };
+  $('lock').addEventListener('submit', async e => {
+    e.preventDefault(); $('lock-go').disabled = true; $('lock-err').textContent = '';
+    tries++;
+    try {
+      const key = await derive($('lock-pass').value);
+      await unlock(key);
+      ev('lock_ok', { tries });
+      try { localStorage.setItem(KEY, JSON.stringify({ salt: M.salt, k: btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey('raw', key)))) })); } catch (x) {}
+    } catch (x) { $('lock-go').disabled = false; const m = String(x && x.message); ev('lock_fail', { tries, reason: m === 'net' || m === 'old' ? m : 'heslo' }); ask(m === 'net' ? L.net : m === 'old' ? L.old : L.bad); }
+  });
+  // zapamatovaný klíč se smaže, jen když opravdu nepasuje (změněné heslo). Výpadek sítě ani stará kopie souboru
+  // po nasazení nové verze hráče neodhlásí: hra se stáhne znovu, a když to nejde, klíč zůstane na příště.
+  // zapamatovaný klíč se smaže, jen když opravdu nepasuje (změněné heslo); výpadek sítě ani stará kopie hráče neodhlásí
+  (async () => {
+    let sv = null;
+    try { sv = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (x) { /* bez úložiště */ }
+    if (sv && sv.salt === M.salt) {
+      try { await unlock(await crypto.subtle.importKey('raw', b64(sv.k), 'AES-GCM', false, ['decrypt'])); return; } catch (x) {
+        const m = String(x && x.message);
+        if (m === 'net') { addEventListener('online', () => location.reload(), { once: true }); return ask(L.net); }
+        if (m === 'old') return ask(L.old);
+      }
+    }
+    try { if (sv) localStorage.removeItem(KEY); } catch (y) { /* bez úložiště */ }
+    ask();
+  })();
+})();
+</script>
+<script>if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
+</body>
+</html>
